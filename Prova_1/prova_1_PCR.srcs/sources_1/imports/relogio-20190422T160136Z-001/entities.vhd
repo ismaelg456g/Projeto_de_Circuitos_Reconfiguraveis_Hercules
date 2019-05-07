@@ -97,8 +97,8 @@ end component;
 
 component reg is
     Port ( clk : in STD_LOGIC;
-           float_in : in STD_LOGIC_VECTOR (FP_WIDTH downto 0);
-           float_out : out STD_LOGIC_VECTOR (FP_WIDTH downto 0);
+           float_in : in STD_LOGIC_VECTOR (FP_WIDTH-1 downto 0);
+           float_out : out STD_LOGIC_VECTOR (FP_WIDTH-1 downto 0);
            en : in STD_LOGIC;
            reset: in STD_LOGIC);
 end component;

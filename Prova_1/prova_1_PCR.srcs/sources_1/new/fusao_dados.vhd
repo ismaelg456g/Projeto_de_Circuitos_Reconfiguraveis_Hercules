@@ -45,6 +45,21 @@ end fusao_dados;
 
 architecture Behavioral of fusao_dados is
     signal sigma_k : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal sigma_k1 : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal sigma_z : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal gk1 : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal mul_sigma_out : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal sub_1_out : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal sub_3_out : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal mul_xf_out : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal divisao_out : std_logic_vector(FP_WIDTH-1 downto 0);
+    signal sub_1_ready : std_logic;
+    signal sub_2_ready : std_logic;
+    signal sub_3_ready : std_logic;
+    signal mul_xf_ready : std_logic;
+    signal mul_sigma_ready : std_logic;
+    signal divisao_ready : std_logic;
+    
 begin
     sub_1: addsubfsm_v6 port map( reset      =>  reset,
                                   clk        =>  clk,
@@ -54,13 +69,59 @@ begin
                                   start_i    =>  start,    
                                   addsub_out =>  sub_1_out,    
                                   ready_as   =>  sub_1_ready);
-    sub_2: addsubfsm_v6 port map();
-    sub_3: addsubfsm_v6 port map();
-    divisao: divNR port map();
-    mul_sigma: multiplierfsm_v2 por map();
-    mul_xf: multiplierfsm_v2 por map();
-    soma: addsubfsm_v6 port map();
-    reg_gk1: reg port map();
-    reg_sigmak: reg port map();
-    
+    sub_2: addsubfsm_v6 port map( reset      =>  reset,
+                                  clk        =>  clk,
+                                  op		 =>  '1',    
+                                  op_a 		 =>  sigma_k,    
+                                  op_b 		 =>  mul_sigma_out,    
+                                  start_i    =>  mul_sigma_ready,    
+                                  addsub_out =>  sigma_k1,    
+                                  ready_as   =>  sub_2_ready);
+    sub_3: addsubfsm_v6 port map( reset      =>  reset,
+                                  clk        =>  clk,
+                                  op		 =>  '1',    
+                                  op_a 		 =>  x_ir,    
+                                  op_b 		 =>  x_ul,    
+                                  start_i    =>  start,    
+                                  addsub_out =>  sub_3_out,    
+                                  ready_as   =>  sub_3_ready);
+    divisao: divNR port map( reset		=> reset,
+                             clk 		=> clk,
+                             start_i 	=> sub_1_ready,
+                             op_a		=> sigma_k,
+                             op_b		=> sub_1_out,
+                             div_out    => divisao_out,
+                             ready_div  => divisao_ready);
+    mul_sigma: multiplierfsm_v2 port map(reset      =>  reset ,
+                                     clk        =>  clk ,
+                                     op_a       =>   gk1,
+                                     op_b       =>   sigma_k,
+                                     start_i	=>   divisao_ready,  
+                                     mul_out    =>   mul_sigma_out,
+                                     ready_mul  =>   mul_sigma_ready);
+    mul_xf: multiplierfsm_v2 port map(reset      =>  reset ,
+                                     clk        =>  clk ,
+                                     op_a       =>   gk1,
+                                     op_b       =>   sub_3_out,
+                                     start_i	=>   sub_3_ready,  
+                                     mul_out    =>   mul_xf_out,
+                                     ready_mul  =>   mul_xf_ready);
+    soma: addsubfsm_v6 port map( reset      =>  reset,
+                                  clk        =>  clk,
+                                  op		 =>  '0',    
+                                  op_a 		 =>  mul_xf_out,    
+                                  op_b 		 =>  x_ul,    
+                                  start_i    =>  mul_xf_ready,    
+                                  addsub_out =>  sub_3_out,    
+                                  ready_as   =>  sub_3_ready);
+    reg_gk1: reg port map(clk       => clk,
+                             float_in  => divisao_out,
+                             float_out => gk1,
+                             en        => divisao_ready,
+                             reset     => reset);
+    reg_sigmak: reg port map(clk       => clk,
+                             float_in  => sigma_k1,
+                             float_out => sigma_k,
+                             en        => sub_2_ready,
+                             reset     => reset);
 end Behavioral;
