@@ -144,5 +144,17 @@ begin
         end loop;
     end process;
     
+    wom_xf: process
+    file outfile: text is out "bin_outfusao.txt";
+    variable outline: line;
+    begin
+        if rising_edge(s_clk) then
+            if s_ready='1' then
+                write(outline, s_x_fus);
+                writeline(outfile, outline);
+            end if;
+        end if;
+    end process;
+    
 
 end Behavioral;
