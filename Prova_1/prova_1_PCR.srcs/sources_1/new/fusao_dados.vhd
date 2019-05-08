@@ -63,7 +63,7 @@ architecture Behavioral of fusao_dados is
 begin
     sub_1: addsubfsm_v6 port map( reset      =>  reset,
                                   clk        =>  clk,
-                                  op		 =>  '1',    
+                                  op		 =>  '0',    
                                   op_a 		 =>  sigma_k,    
                                   op_b 		 =>  sigma_z,    
                                   start_i    =>  start,    
@@ -112,8 +112,8 @@ begin
                                   op_a 		 =>  mul_xf_out,    
                                   op_b 		 =>  x_ul,    
                                   start_i    =>  mul_xf_ready,    
-                                  addsub_out =>  sub_3_out,    
-                                  ready_as   =>  sub_3_ready);
+                                  addsub_out =>  x_fus,    
+                                  ready_as   =>  ready);
     reg_gk1: reg port map(clk       => clk,
                              float_in  => divisao_out,
                              float_out => gk1,
