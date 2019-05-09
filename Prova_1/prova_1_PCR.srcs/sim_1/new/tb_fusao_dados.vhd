@@ -42,12 +42,14 @@ end tb_fusao_dados;
 
 architecture Behavioral of tb_fusao_dados is
 component fusao_dados is
-    Port ( ready: out STD_LOGIC;
-           start: in STD_LOGIC;
+    Port ( ready : out STD_LOGIC;
+           start : in STD_LOGIC;
            x_ul : in STD_LOGIC_VECTOR (FP_WIDTH-1 downto 0);
            x_ir : in STD_LOGIC_VECTOR (FP_WIDTH-1 downto 0);
-           x_fus:  out STD_LOGIC_VECTOR (FP_WIDTH-1 downto 0);
-           clk  :  in std_logic;
+           sigma_k: in std_logic_vector(FP_WIDTH-1 downto 0);
+           sigma_z: in std_logic_vector(FP_WIDTH-1 downto 0);
+           x_fus : out STD_LOGIC_VECTOR (FP_WIDTH-1 downto 0);
+           clk : in std_logic;
            reset: in std_logic);
 end component;
 
@@ -64,13 +66,16 @@ signal first_start: std_logic;
 
 
 begin
-    uut: fusao_dados port map(ready=> s_ready,
-                              start=> s_start,
-                              x_ul => s_x_ul ,
-                              x_ir => s_x_ir ,
-                              x_fus=> s_x_fus,
-                              clk  => s_clk  ,
-                              reset=> s_reset);
+    uut: fusao_dados
+    port map(ready=> s_ready,
+             start=> s_start,
+             x_ul => s_x_ul ,
+             x_ir => s_x_ir ,
+             sigma_k => s_sigma_k,
+             sigma_z => s_sigma_z,
+             x_fus=> s_x_fus,
+             clk  => s_clk  ,
+             reset=> s_reset);
     
     clk_gen:process
     begin
@@ -79,7 +84,6 @@ begin
         s_clk<='0';
         wait for 5 ns;
     end process;
-    
     
     rom_x_ir:process
     file infile: text is in "bin_xir.txt";
