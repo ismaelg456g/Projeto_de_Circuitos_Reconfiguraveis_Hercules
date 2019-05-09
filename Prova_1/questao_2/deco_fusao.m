@@ -15,7 +15,7 @@ result_hw=zeros(N,1);
 result_sw=zeros(N,1);
 
 for i=1:N
-  result_hw(i,1)=bin2float(cell2mat(bin_outneuron(i)),EW,FW);
+  result_hw(i,1)=bin2float(cell2mat(bin_outfusao(i)),EW,FW);
   xir=xir_vet(i);
   xul=xul_vet(i);
   [sigma_k result_sw(i)] = calcula_fusao(xir, xul, sigma_k, sigma_z);
